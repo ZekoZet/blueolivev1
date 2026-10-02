@@ -1,0 +1,138 @@
+---
+import TopBar from '../components/TopBar.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import FloatingMenu from '../components/FloatingMenu.astro';
+import Intro from '../components/Intro.astro';
+import { site } from '../data/site';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  path?: string;
+  intro?: boolean;
+}
+const { title = site.title, description = site.description, path = '/', intro = false } = Astro.props;
+const canonical = new URL(path, Astro.site).href;
+const ogImage = new URL('/og-image.png', Astro.site).href;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfessionalService',
+  name: site.name,
+  slogan: site.tagline,
+  description: site.description,
+  url: site.url,
+  logo: new URL('/icon-512.png', Astro.site).href,
+  image: ogImage,
+  founder: { '@type': 'Person', name: site.owner },
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: site.street,
+    postalCode: site.zip,
+    addressLocality: site.city,
+    addressCountry: 'DE',
+  },
+  areaServed: 'DE',
+  knowsAbout: ['Webdesign', 'UI/UX-Design', 'Figma', 'Astro', 'TypeScript', 'Tailwind CSS', 'Barrierefreiheit', 'Web Performance'],
+};
+---
+
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta name="theme-color" content="#030d14" />
+    <meta name="color-scheme" content="dark" />
+    {intro && <meta name="intro" content="1" />}
+
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="de_DE" />
+    <meta property="og:site_name" content={site.name} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+    <!-- Intro nur beim ersten Besuch je Sitzung; zweistufiges Font-Laden (erst nach LCP + load) -->
+    <script is:inline>
+      (() => {
+        const html = document.documentElement;
+        html.classList.add('js');
+        const motionOK = matchMedia('(prefers-reduced-motion: no-preference)').matches;
+        let seen = false;
+        try {
+          seen = sessionStorage.getItem('intro-seen') === '1';
+          if (!seen) sessionStorage.setItem('intro-seen', '1');
+        } catch {}
+        if (seen) html.classList.add('intro-seen');
+        // Ohne Intro: Hero-Startzustand schon vor dem ersten Bild setzen (Animation startet in anim.ts)
+        if (motionOK && (seen || !document.querySelector('meta[name="intro"]'))) html.classList.add('hero-armed');
+        const KEY = 'fonts-ready';
+        const ready = () => html.classList.add(KEY);
+        let cached = false;
+        try {
+          cached = sessionStorage.getItem(KEY) === '1';
+        } catch {}
+        if (cached) return ready();
+        const load = () =>
+          Promise.all([document.fonts.load('400 1em Montserrat'), document.fonts.load('600 1em Montserrat')])
+            .then(() => {
+              ready();
+              try {
+                sessionStorage.setItem(KEY, '1');
+              } catch {}
+            })
+            .catch(() => {});
+        const idle = () => setTimeout(() => ('requestIdleCallback' in window ? requestIdleCallback(load, { timeout: 2000 }) : load()), 800);
+        const afterLoad = () => (document.readyState === 'complete' ? idle() : addEventListener('load', idle, { once: true }));
+        try {
+          const po = new PerformanceObserver(() => {
+            po.disconnect();
+            afterLoad();
+          });
+          po.observe({ type: 'largest-contentful-paint', buffered: true });
+        } catch {
+          afterLoad();
+        }
+      })();
+    </script>
+  </head>
+  <body class="min-h-dvh">
+    <a href="#main" class="fixed top-3 left-3 z-[110] -translate-y-20 rounded-full bg-paper px-4 py-2.5 text-sm font-semibold text-ink transition-transform focus:translate-y-0">
+      Direkt zum Inhalt
+    </a>
+    {intro && <Intro />}
+    <TopBar />
+    <Header />
+    <main id="main" tabindex="-1" class="outline-none">
+      <slot />
+    </main>
+    <Footer />
+    <FloatingMenu />
+
+    <script>
+      import '../scripts/anim';
+      import { initMotion } from '../scripts/motion';
+      void initMotion();
+    </script>
+  </body>
+</html>

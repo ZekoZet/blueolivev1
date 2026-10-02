@@ -1,0 +1,132 @@
+---
+// Eigene Platinen-Illustration: Chip mit Oliven-Logo, 6 Kacheln (Werkzeuge) und Leiterbahnen.
+// Lichtimpulse laufen per SVG-animateMotion über die Bahnen (skaliert mit dem viewBox, ohne JavaScript).
+import { Image } from 'astro:assets';
+import olive from '../assets/brand/logo-olive.png';
+import { hero } from '../data/site';
+
+const W = 1100;
+const H = 380;
+const cx = W / 2;
+const chipY = 205;
+
+// Kachel-Positionen (links/rechts, oben/mittig/unten)
+const nodes = [
+  { x: 120, y: 95 },
+  { x: 60, y: 220 },
+  { x: 140, y: 330 },
+  { x: 980, y: 95 },
+  { x: 1040, y: 220 },
+  { x: 960, y: 330 },
+];
+
+// Leiterbahnen: von der Kachel horizontal, dann schräg zum Chip-Rand
+const paths = nodes.map((n, i) => {
+  const left = n.x < cx;
+  const pinY = chipY - 30 + (i % 3) * 30;
+  const chipEdge = left ? cx - 62 : cx + 62;
+  const bendX = left ? cx - 170 : cx + 170;
+  const startX = left ? n.x + 34 : n.x - 34;
+  return `M${startX},${n.y} H${left ? bendX - Math.abs(n.y - pinY) : bendX + Math.abs(n.y - pinY)} L${bendX},${pinY} H${chipEdge}`;
+});
+// zusätzliche feine Bahnen (Dekoration) ober- und unterhalb des Chips
+const extra = [
+  `M${cx - 30},${chipY + 62} V${H}`,
+  `M${cx},${chipY + 62} V${H}`,
+  `M${cx + 30},${chipY + 62} V${H}`,
+  `M${cx - 210},${chipY + 20} H${cx - 62}`,
+  `M${cx + 62},${chipY + 20} H${cx + 210}`,
+];
+---
+
+<div class="circuit relative mx-auto aspect-[1100/380] w-full max-w-[1100px]" aria-hidden="true">
+  <svg viewBox={`0 0 ${W} ${H}`} class="absolute inset-0 size-full" fill="none" data-hero="glow" style="--hd:1550ms">
+    <defs>
+      <linearGradient id="pulse" x1="0" x2="1">
+        <stop offset="0" stop-color="#38bdf8" stop-opacity="0" />
+        <stop offset="0.7" stop-color="#38bdf8" />
+        <stop offset="1" stop-color="#e0f6ff" />
+      </linearGradient>
+      <linearGradient id="trace" x1="0" x2="1">
+        <stop offset="0" stop-color="#38bdf8" stop-opacity="0.05" />
+        <stop offset="0.5" stop-color="#38bdf8" stop-opacity="0.22" />
+        <stop offset="1" stop-color="#38bdf8" stop-opacity="0.05" />
+      </linearGradient>
+    </defs>
+    {paths.map((d) => <path d={d} stroke="url(#trace)" stroke-width="1.5" />)}
+    {extra.map((d) => <path d={d} stroke="rgb(56 189 248 / 0.12)" stroke-width="1" />)}
+    <!-- Lichtimpulse -->
+    {
+      paths.map((d, i) => {
+        const dur = `${(3.2 + (i % 3) * 0.6).toFixed(1)}s`;
+        const begin = `${(i * 0.7).toFixed(1)}s`;
+        return (
+          <g class="pulse" opacity="0">
+            <rect x="-26" y="-6" width="52" height="12" rx="6" fill="#38bdf8" opacity="0.22" />
+            <rect x="-26" y="-1.6" width="52" height="3.2" rx="1.6" fill="url(#pulse)" />
+            <animateMotion dur={dur} begin={begin} repeatCount="indefinite" rotate="auto" path={d} />
+            <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.1;0.85;1" dur={dur} begin={begin} repeatCount="indefinite" />
+          </g>
+        );
+      })
+    }
+  </svg>
+
+  <!-- Kacheln -->
+  {
+    nodes.map((n, i) => (
+      <span
+        class="node absolute grid -translate-x-1/2 -translate-y-1/2 place-items-center rounded-2xl border border-white/10 text-[clamp(0.6rem,1.3vw,0.9rem)] font-bold text-paper-soft"
+        style={`left:${(n.x / W) * 100}%;top:${(n.y / H) * 100}%;--hd:${1350 + i * 90}ms`}
+        data-hero="pop"
+        title={hero.nodeLabels[i]}
+      >
+        {hero.nodes[i]}
+      </span>
+    ))
+  }
+
+  <!-- Chip -->
+  <span class="chip absolute grid -translate-x-1/2 -translate-y-1/2 place-items-center rounded-[22%]" style={`left:50%;top:${(chipY / H) * 100}%;--hd:1200ms`} data-hero="pop">
+    <Image src={olive} alt="" widths={[64, 128]} sizes="64px" width={64} height={64} class="w-[58%]" loading="lazy" />
+  </span>
+</div>
+
+<style>
+  .node {
+    width: clamp(2.4rem, 5.6vw, 4rem);
+    height: clamp(2.4rem, 5.6vw, 4rem);
+    background: linear-gradient(180deg, rgb(8 30 48 / 0.95), rgb(5 20 33 / 0.95));
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 10px 30px -12px rgb(0 0 0 / 0.8);
+  }
+  .chip {
+    width: clamp(4.5rem, 11vw, 7.5rem);
+    height: clamp(4.5rem, 11vw, 7.5rem);
+    background: linear-gradient(180deg, #0b2740, #061624);
+    border: 1px solid rgb(56 189 248 / 0.25);
+    box-shadow:
+      0 0 0 6px rgb(56 189 248 / 0.04),
+      0 0 60px -10px rgb(14 165 233 / 0.55),
+      inset 0 1px 0 rgb(255 255 255 / 0.08);
+  }
+  /* Pins am Chip */
+  .chip::before,
+  .chip::after {
+    content: '';
+    position: absolute;
+    inset: 18% -9%;
+    background: repeating-linear-gradient(180deg, rgb(56 189 248 / 0.35) 0 3px, transparent 3px 14px);
+    mask: linear-gradient(90deg, #000 9%, transparent 9% 91%, #000 91%);
+    z-index: -1;
+  }
+  .chip::after {
+    inset: -9% 18%;
+    background: repeating-linear-gradient(90deg, rgb(56 189 248 / 0.35) 0 3px, transparent 3px 14px);
+    mask: linear-gradient(180deg, #000 9%, transparent 9% 91%, #000 91%);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .pulse {
+      display: none;
+    }
+  }
+</style>

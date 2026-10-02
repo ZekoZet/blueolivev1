@@ -1,0 +1,126 @@
+---
+// Navigation: zu Beginn volle Breite (Logo links, Menü Mitte, Buttons rechts),
+// beim Scrollen Morph zur zentrierten, abgerundeten Leiste. Nur Desktop mit Maus;
+// Handy & Tablet nutzen den Floating-Menu-Button.
+import Logo from './Logo.astro';
+import Icon from './Icon.astro';
+import { cta, ctaSecondary, nav } from '../data/site';
+---
+
+<header id="site-header" class="pointer-events-none sticky top-0 z-50 hidden h-0 desk:block" data-state="top">
+  <div class="header-shell pointer-events-auto mx-auto mt-3 flex items-center justify-between gap-6">
+    <a href="#top" class="header-logo flex shrink-0 items-center" aria-label="Blue Olive Lab – zum Seitenanfang">
+      <span class="logo-full"><Logo size={34} eager /></span>
+      <span class="logo-icon"><Logo variant="icon" size={30} eager /></span>
+    </a>
+
+    <nav aria-label="Hauptnavigation">
+      <ul class="flex items-center gap-1" data-hero-nav>
+        {
+          nav.map((item, i) => (
+            <li class="group relative" data-nav-item style={`--ni:${i}`}>
+              {item.children ? (
+                <>
+                  <button
+                    type="button"
+                    class="flex h-10 items-center gap-1 rounded-full px-3.5 text-[0.85rem] font-medium text-paper-soft transition-colors hover:text-paper"
+                    aria-expanded="false"
+                    data-dropdown-toggle
+                  >
+                    {item.label}
+                    <Icon name="chevron-down" size={14} class="transition-transform duration-200 group-hover:rotate-180" />
+                  </button>
+                  <div class="invisible absolute top-full left-1/2 w-80 -translate-x-1/2 translate-y-2 pt-3 opacity-0 transition-[opacity,transform] duration-200 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-data-[open=true]:visible group-data-[open=true]:translate-y-0 group-data-[open=true]:opacity-100">
+                    <ul class="rounded-2xl border border-white/8 bg-ink-soft/95 p-2 shadow-2xl">
+                      {item.children.map((child) => (
+                        <li>
+                          <a href={child.href} class="flex flex-col rounded-xl px-3.5 py-2.5 transition-colors hover:bg-white/5">
+                            <span class="text-sm font-semibold text-paper">{child.label}</span>
+                            <span class="text-xs text-paper-mute">{child.text}</span>
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </>
+              ) : (
+                <a href={item.href} class="flex h-10 items-center rounded-full px-3.5 text-[0.85rem] font-medium text-paper-soft transition-colors hover:text-paper">
+                  {item.label}
+                </a>
+              )}
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="flex items-center gap-2" data-hero-nav>
+      <a href={ctaSecondary.href} style="--ni:6" class="header-secondary btn btn-soft !min-h-10 !px-4 !text-[0.8rem]">{ctaSecondary.label}</a>
+      <a href={cta.href} style="--ni:7" class="header-cta btn btn-primary !min-h-10 !px-4 !text-[0.8rem]">{cta.label}</a>
+    </div>
+  </div>
+</header>
+
+<style>
+  .header-shell {
+    max-width: 76rem;
+    padding: 0.5rem 2rem;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    transition:
+      max-width 0.5s var(--ease-out-soft),
+      padding 0.5s var(--ease-out-soft),
+      background-color 0.4s ease,
+      border-color 0.4s ease,
+      box-shadow 0.4s ease;
+  }
+  .logo-icon {
+    display: none;
+  }
+  /* Pill-Zustand nach dem Scrollen */
+  [data-state='pill'] .header-shell {
+    max-width: 44rem;
+    padding: 0.35rem 0.4rem 0.35rem 0.45rem;
+    background: rgb(5 20 33 / 0.86);
+    border-color: rgb(255 255 255 / 0.08);
+    box-shadow: 0 12px 40px -12px rgb(0 0 0 / 0.7);
+  }
+  [data-state='pill'] .logo-full,
+  [data-state='pill'] .header-secondary {
+    display: none;
+  }
+  [data-state='pill'] .logo-icon {
+    display: inline-flex;
+  }
+  [data-state='pill'] .header-cta {
+    background: #fff;
+    box-shadow: none;
+  }
+</style>
+
+<script>
+  const header = document.getElementById('site-header');
+  if (header) {
+    const update = () => header.setAttribute('data-state', window.scrollY > 120 ? 'pill' : 'top');
+    update();
+    window.addEventListener('scroll', update, { passive: true });
+
+    header.querySelectorAll<HTMLButtonElement>('[data-dropdown-toggle]').forEach((btn) => {
+      const item = btn.closest<HTMLElement>('[data-nav-item]');
+      const set = (open: boolean) => {
+        btn.setAttribute('aria-expanded', String(open));
+        item?.setAttribute('data-open', String(open));
+      };
+      btn.addEventListener('click', () => set(btn.getAttribute('aria-expanded') !== 'true'));
+      item?.addEventListener('focusout', (e) => {
+        if (!item.contains(e.relatedTarget as Node)) set(false);
+      });
+      item?.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          set(false);
+          btn.focus();
+        }
+      });
+    });
+  }
+</script>

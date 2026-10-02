@@ -1,0 +1,120 @@
+---
+import Icon, { type IconName } from './Icon.astro';
+import Words from './Words.astro';
+import { explain } from '../data/site';
+
+const chipIcons: IconName[] = ['pen', 'code', 'gauge'];
+---
+
+<section id="ablauf" class="on-light relative bg-light py-20 text-light-text md:py-28" data-stack>
+  <div class="container-page">
+    <!-- Tabs: schwarzer Punkt wächst zur Pille (Referenzvideo) -->
+    <div class="flex justify-center" role="tablist" aria-label="Über Blue Olive Lab" data-tabs>
+      <div class="inline-flex gap-1 rounded-full p-1" data-anim="pill" style="--px:26%">
+        {
+          explain.tabs.map((t, i) => (
+            <button
+              type="button"
+              role="tab"
+              id={`tab-${i}`}
+              aria-controls={`panel-${i}`}
+              aria-selected={i === 0 ? 'true' : 'false'}
+              tabindex={i === 0 ? 0 : -1}
+              class="min-h-10 rounded-full px-4 text-sm font-semibold text-light-mute transition-colors hover:text-light-text aria-selected:bg-ink aria-selected:text-paper"
+            >
+              {t}
+            </button>
+          ))
+        }
+      </div>
+    </div>
+
+    <h2 class="h2 mx-auto mt-6 max-w-3xl text-center" data-anim="words" style="--delay:500ms"><Words text={explain.title} /></h2>
+
+    <div class="mt-12 grid gap-5 lg:grid-cols-[0.8fr_1.6fr]">
+      <!-- Bildkarte -->
+      <div class="relative isolate flex min-h-80 flex-col justify-end overflow-hidden rounded-[var(--radius-card)] bg-ink p-7 text-paper" data-anim="rise">
+        <div class="streaks absolute inset-0 -z-10" aria-hidden="true"></div>
+        <p class="max-w-[16ch] text-lg leading-snug font-semibold" data-anim="words" style="--delay:700ms;--step:70ms"><Words text={explain.cardTitle} /></p>
+      </div>
+
+      <!-- Textkarte mit Laufband -->
+      <div class="card-light flex flex-col overflow-hidden" data-anim="fade" style="--delay:150ms">
+        <div class="p-7 md:p-10">
+          {
+            explain.panels.map((p, i) => (
+              <div role="tabpanel" id={`panel-${i}`} aria-labelledby={`tab-${i}`} hidden={i !== 0}>
+                <p class="max-w-2xl text-xl leading-snug font-semibold md:text-[1.4rem]" data-anim="words" style="--delay:400ms;--step:45ms">
+                  <Words text={p.lead} />
+                </p>
+                <p class="mt-4 max-w-2xl text-[0.95rem] text-light-mute" data-anim="words" style="--delay:900ms;--step:22ms">
+                  <Words text={p.text} />
+                </p>
+              </div>
+            ))
+          }
+        </div>
+        <div class="mt-auto space-y-3 pb-7" aria-label="Leistungen im Überblick" data-anim="stagger" style="--delay:1100ms;--step:220ms">
+          {
+            explain.chips.map((row, r) => (
+              <div class="marquee" data-reverse={r % 2 === 1 ? '' : undefined} style={`--marquee-duration:${32 + r * 6}s`}>
+                {[0, 1].map((copy) => (
+                  <ul class="marquee-track" aria-hidden={copy === 1 ? 'true' : undefined}>
+                    {row.map((chip) => (
+                      <li class="flex items-center gap-2 rounded-full border border-light-line bg-light px-3.5 py-2 text-[0.8rem] font-semibold whitespace-nowrap">
+                        <Icon name={chipIcons[r]} size={15} class="text-olive-deep" />
+                        {chip}
+                      </li>
+                    ))}
+                  </ul>
+                ))}
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .streaks {
+    background:
+      radial-gradient(60% 50% at 20% 0%, rgb(56 189 248 / 0.55), transparent 70%),
+      repeating-linear-gradient(90deg, transparent 0 22px, rgb(56 189 248 / 0.07) 22px 23px),
+      linear-gradient(180deg, #0b2740 0%, #030d14 75%);
+  }
+  .streaks::after {
+    content: '';
+    position: absolute;
+    inset: -20% 30% 40% -20%;
+    background: linear-gradient(115deg, transparent 40%, rgb(224 246 255 / 0.5) 50%, transparent 60%);
+    filter: blur(14px);
+  }
+</style>
+
+<script>
+  // Tabs (WAI-ARIA): Klick und Pfeiltasten
+  const list = document.querySelector<HTMLElement>('[data-tabs]');
+  if (list) {
+    const tabs = [...list.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+    const select = (i: number) => {
+      tabs.forEach((t, n) => {
+        const on = n === i;
+        t.setAttribute('aria-selected', String(on));
+        t.tabIndex = on ? 0 : -1;
+        const panel = document.getElementById(t.getAttribute('aria-controls') ?? '');
+        if (panel) panel.hidden = !on;
+      });
+    };
+    tabs.forEach((t, i) => {
+      t.addEventListener('click', () => select(i));
+      t.addEventListener('keydown', (e) => {
+        if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+        const next = (i + (e.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+        select(next);
+        tabs[next]?.focus();
+      });
+    });
+  }
+</script>

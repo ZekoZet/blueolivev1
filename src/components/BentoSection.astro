@@ -1,0 +1,136 @@
+---
+import Words from './Words.astro';
+import Icon from './Icon.astro';
+import { bento } from '../data/site';
+
+const [lighthouse, figma, a11y, scroll, system, responsive, code] = bento.items;
+const scores = ['Performance', 'Barrierefreiheit', 'Best Practices', 'SEO'];
+---
+
+<section id="leistungen" class="on-dark relative isolate bg-ink py-20 md:py-28" data-stack>
+  <div class="grid-lines absolute inset-0 -z-10" aria-hidden="true"></div>
+  <div class="container-page">
+    <div class="text-center">
+      <p class="badge" data-anim="fade">{bento.badge}</p>
+      <h2 class="h2 mx-auto mt-5 max-w-3xl" data-anim="words"><Words text={bento.title} /></h2>
+    </div>
+
+    <ul class="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-12" data-anim="cards">
+      <!-- 1: Lighthouse (breit) -->
+      <li class="card-dark flex min-h-80 flex-col p-7 lg:col-span-7">
+        <h3 class="text-lg font-semibold">{lighthouse.title}</h3>
+        <p class="mt-2 max-w-md text-sm text-paper-soft">{lighthouse.text}</p>
+        <div class="mt-auto grid grid-cols-2 gap-4 pt-8 sm:grid-cols-4" aria-hidden="true" data-light>
+          {
+            scores.map((s) => (
+              <div class="flex flex-col items-center gap-2">
+                <span class="ring grid size-[4.5rem] place-items-center rounded-full text-lg font-bold text-success">100</span>
+                <span class="text-center text-[0.7rem] text-paper-mute">{s}</span>
+              </div>
+            ))
+          }
+        </div>
+      </li>
+
+      <!-- 2: Figma -->
+      <li class="card-dark flex min-h-80 flex-col p-7 lg:col-span-5">
+        <h3 class="text-lg font-semibold">{figma.title}</h3>
+        <p class="mt-2 text-sm text-paper-soft">{figma.text}</p>
+        <div class="relative mt-auto h-36 pt-6" aria-hidden="true" data-light>
+          <div class="absolute inset-x-6 top-6 bottom-0 rounded-xl border border-dashed border-olive-bright/50 bg-olive/5">
+            <span class="absolute -top-5 left-0 rounded bg-olive px-1.5 py-0.5 text-[0.6rem] font-bold text-ink">Startseite · 1440</span>
+            <div class="m-3 h-3 w-2/5 rounded bg-white/15"></div>
+            <div class="mx-3 h-2 w-3/5 rounded bg-white/10"></div>
+            <div class="mx-3 mt-2 h-2 w-1/2 rounded bg-white/10"></div>
+            <div class="m-3 inline-block h-6 w-24 rounded-full bg-olive/70"></div>
+          </div>
+          <svg class="absolute right-10 bottom-6 size-6 text-paper drop-shadow" viewBox="0 0 24 24" fill="currentColor"><path d="M4 2l16 9-7 2-3 7L4 2Z" /></svg>
+        </div>
+      </li>
+
+      <!-- 3: Barrierefreiheit -->
+      <li class="card-dark flex min-h-72 flex-col p-7 lg:col-span-4">
+        <h3 class="text-lg font-semibold">{a11y.title}</h3>
+        <p class="mt-2 text-sm text-paper-soft">{a11y.text}</p>
+        <div class="mt-auto grid place-items-center pt-6" aria-hidden="true">
+          <span class="glow-tile grid size-20 place-items-center rounded-2xl" data-light>
+            <svg viewBox="0 0 24 24" class="size-10 text-olive-bright" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="4.5" r="1.8" fill="currentColor" stroke="none" /><path d="M5 8.5l7 1.5 7-1.5M12 10v4.5m0 0-3 6m3-6 3 6" /></svg>
+          </span>
+        </div>
+      </li>
+
+      <!-- 4: Zero-Jank -->
+      <li class="card-dark flex min-h-72 flex-col p-7 lg:col-span-4">
+        <h3 class="text-lg font-semibold">{scroll.title}</h3>
+        <p class="mt-2 text-sm text-paper-soft">{scroll.text}</p>
+        <div class="mt-auto pt-6" aria-hidden="true">
+          <div class="flex items-end justify-between text-[0.65rem] text-paper-mute"><span>Bildrate</span><span class="font-bold text-olive-bright">60 fps</span></div>
+          <svg viewBox="0 0 200 50" class="mt-2 w-full" fill="none" data-light>
+            <path d="M0 40 H200" stroke="rgb(255 255 255 / 0.08)" />
+            <path d="M0 12 C20 11 30 13 50 12 S80 11 100 12 130 13 150 12 180 11 200 12" stroke="#38bdf8" stroke-width="2" />
+            <path d="M0 12 C20 11 30 13 50 12 S80 11 100 12 130 13 150 12 180 11 200 12 V50 H0Z" fill="url(#fps)" opacity="0.35" />
+            <defs><linearGradient id="fps" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#38bdf8" /><stop offset="1" stop-color="#38bdf8" stop-opacity="0" /></linearGradient></defs>
+          </svg>
+        </div>
+      </li>
+
+      <!-- 5: Design-System -->
+      <li class="card-dark flex min-h-72 flex-col p-7 md:col-span-2 lg:col-span-4">
+        <h3 class="text-lg font-semibold">{system.title}</h3>
+        <p class="mt-2 text-sm text-paper-soft">{system.text}</p>
+        <div class="mt-auto grid grid-cols-6 gap-1.5 pt-6" aria-hidden="true" data-light>
+          {
+            ['#030d14', '#051421', '#081e30', '#0369a1', '#0ea5e9', '#38bdf8', '#a1c2d6', '#ffffff', '#54778f', '#10b981', '#f59e0b', '#0ea5e9'].map((c, i) => (
+              <span class:list={['aspect-square rounded-lg border border-white/8', i === 4 && 'ring-2 ring-olive-bright/60']} style={`background:${c}`} />
+            ))
+          }
+        </div>
+      </li>
+
+      <!-- 6: Responsive -->
+      <li class="card-dark flex min-h-72 flex-col p-7 lg:col-span-7">
+        <h3 class="text-lg font-semibold">{responsive.title}</h3>
+        <p class="mt-2 max-w-md text-sm text-paper-soft">{responsive.text}</p>
+        <div class="mt-auto flex items-end justify-center gap-4 pt-8" aria-hidden="true" data-light>
+          <span class="device h-28 w-44 rounded-lg"></span>
+          <span class="device h-24 w-[4.5rem] rounded-lg"></span>
+          <span class="device h-20 w-11 rounded-md"></span>
+        </div>
+      </li>
+
+      <!-- 7: Code -->
+      <li class="card-dark flex min-h-72 flex-col p-7 lg:col-span-5">
+        <h3 class="text-lg font-semibold">{code.title}</h3>
+        <p class="mt-2 text-sm text-paper-soft">{code.text}</p>
+        <div class="mt-auto pt-6" aria-hidden="true">
+          <div class="flex items-center gap-3 rounded-xl border border-white/8 bg-ink/80 p-4 font-mono text-[0.72rem] leading-relaxed">
+            <span class="glow-tile grid size-12 shrink-0 place-items-center rounded-xl" data-light><Icon name="code" size={22} class="text-olive-bright" /></span>
+            <code class="text-paper-soft"><span class="text-olive-bright">pnpm</span> build<br /><span class="text-success">✓</span> 7 Seiten · 0 ms Blockierzeit</code>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<style>
+  .ring {
+    background:
+      radial-gradient(closest-side, var(--color-ink-card) 82%, transparent 83% 100%),
+      conic-gradient(var(--color-success) 100%, transparent 0);
+    box-shadow: 0 0 24px -6px rgb(16 185 129 / 0.5);
+  }
+  .glow-tile {
+    background: linear-gradient(180deg, #0b2740, #061624);
+    border: 1px solid rgb(56 189 248 / 0.3);
+    box-shadow: 0 0 40px -8px rgb(14 165 233 / 0.6);
+  }
+  .device {
+    border: 1px solid rgb(56 189 248 / 0.35);
+    background:
+      linear-gradient(rgb(56 189 248 / 0.25), rgb(56 189 248 / 0.25)) 10% 18% / 50% 6% no-repeat,
+      linear-gradient(rgb(255 255 255 / 0.12), rgb(255 255 255 / 0.12)) 10% 34% / 70% 5% no-repeat,
+      linear-gradient(180deg, rgb(8 30 48 / 0.9), rgb(5 20 33 / 0.9));
+    box-shadow: 0 0 30px -10px rgb(14 165 233 / 0.5);
+  }
+</style>

@@ -1,0 +1,45 @@
+---
+// Oliven-Logo + Wortmarke. variant="icon" zeigt nur das Logo.
+// Die Wortmarke besteht aus einzelnen Buchstaben (Buchstaben-Animation wie im Referenzvideo);
+// für Screenreader steht der Name einmal als normaler Text daneben.
+import { Image } from 'astro:assets';
+import olive from '../assets/brand/logo-olive.png';
+import { site } from '../data/site';
+
+interface Props {
+  variant?: 'full' | 'icon';
+  size?: number;
+  class?: string;
+  eager?: boolean;
+}
+const { variant = 'full', size = 36, class: className, eager = false } = Astro.props;
+const letters = 'BLUE OLIVE LAB'.split('');
+---
+
+<span class:list={['logo inline-flex items-center gap-2.5', className]}>
+  <Image
+    src={olive}
+    alt={variant === 'icon' ? site.name : ''}
+    widths={[size, size * 2, size * 3]}
+    sizes={`${size}px`}
+    width={size}
+    height={size}
+    loading={eager ? 'eager' : 'lazy'}
+    class="logo-icon-img shrink-0 drop-shadow-[0_0_10px_rgb(56_189_248/0.35)]"
+    style={`width:${size}px;height:${size}px`}
+  />
+  {
+    variant === 'full' && (
+      <span class="text-[0.95rem] leading-none font-bold tracking-[0.18em] whitespace-nowrap">
+        <span class="sr-only">{site.name}</span>
+        <span class="letters" aria-hidden="true">
+          {letters.map((ch, i) => (
+            <span class:list={['l', i >= 11 && 'text-olive-bright']} style={`--i:${i}`}>
+              {ch === ' ' ? ' ' : ch}
+            </span>
+          ))}
+        </span>
+      </span>
+    )
+  }
+</span>

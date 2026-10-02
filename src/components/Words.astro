@@ -1,0 +1,22 @@
+---
+// Zerlegt Text beim Build in Wörter (bzw. Buchstaben) für die Wort-für-Wort-Animation.
+// Kein JavaScript nötig, kein Layout-Sprung. Leerzeichen bleiben echte Textknoten,
+// Screenreader lesen den Text daher normal.
+interface Props {
+  text: string;
+  /** Startindex, um mehrere Abschnitte fortlaufend zu staffeln */
+  offset?: number;
+}
+const { text, offset = 0 } = Astro.props;
+const words = text.trim().split(/\s+/);
+---
+
+{
+  words.map((w, i) => (
+    <>
+      <span class="w" style={`--i:${i + offset}`}>
+        {w}
+      </span>{' '}
+    </>
+  ))
+}

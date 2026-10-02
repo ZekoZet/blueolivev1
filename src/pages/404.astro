@@ -1,0 +1,19 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+---
+
+<BaseLayout title="Seite nicht gefunden – Blue Olive Lab" description="Diese Seite gibt es nicht (mehr)." path="/404/">
+  <section class="on-dark relative isolate grid min-h-[70svh] place-items-center bg-ink px-5 text-center">
+    <div class="grid-lines absolute inset-0 -z-10" aria-hidden="true"></div>
+    <div>
+      <p class="badge">Fehler 404</p>
+      <h1 class="display mt-5">Seite nicht gefunden</h1>
+      <p class="lead mx-auto mt-4 max-w-md">Die aufgerufene Adresse existiert nicht. Vielleicht hilft der Weg zurück zur Startseite.</p>
+      <a href="/" class="btn btn-primary mt-8">
+        Zur Startseite
+        <Icon name="arrow-right" size={16} />
+      </a>
+    </div>
+  </section>
+</BaseLayout>

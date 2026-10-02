@@ -1,0 +1,567 @@
+@import 'tailwindcss';
+
+/* ---------- Fonts (self-hosted, Teilmengen via scripts/subset-fonts.mjs) ---------- */
+@font-face {
+  font-family: 'Montserrat';
+  src: url('/fonts/montserrat-var-latin.woff2') format('woff2');
+  font-weight: 400 800;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+2013-2014, U+2018-201E, U+2022, U+2026, U+20AC, U+2122, U+2190-2193;
+}
+/* latin-ext (u. a. türkische Sonderzeichen) – lädt nur bei Bedarf */
+@font-face {
+  font-family: 'Montserrat';
+  src: url('/fonts/montserrat-var-ext.woff2') format('woff2');
+  font-weight: 400 800;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0100-0130, U+0132-017F;
+}
+/* Ersatzschrift mit angepassten Maßen (Capsize) → kein Layout-Sprung beim Wechsel */
+@font-face {
+  font-family: 'Montserrat Fallback';
+  src: local('Arial'), local('ArialMT'), local('Liberation Sans'), local('Roboto Regular'), local('Roboto-Regular'), local('Roboto');
+  ascent-override: 85.7923%;
+  descent-override: 22.2457%;
+  line-gap-override: 0%;
+  size-adjust: 112.8307%;
+}
+
+/* ---------- Gerätevarianten ---------- */
+@custom-variant touch {
+  @media (width < 64rem), (hover: none) {
+    @slot;
+  }
+}
+@custom-variant desk {
+  @media (width >= 64rem) and (hover: hover) {
+    @slot;
+  }
+}
+
+/* ---------- Design-Tokens ---------- */
+@theme {
+  --breakpoint-*: initial;
+  --breakpoint-sm: 30rem;
+  --breakpoint-md: 48rem;
+  --breakpoint-lg: 64rem;
+  --breakpoint-xl: 90rem;
+
+  --color-ink: #030d14; /* Canvas */
+  --color-ink-soft: #051421; /* Sektionen */
+  --color-ink-card: #081e30; /* Karten */
+  --color-olive: #0ea5e9; /* Primärer Akzent */
+  --color-olive-bright: #38bdf8; /* Highlight & Glow */
+  --color-olive-deep: #0369a1; /* Tiefenkontrast, Akzent auf Hell */
+  --color-paper: #ffffff;
+  --color-paper-soft: #a1c2d6;
+  --color-paper-mute: #54778f;
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  /* helle Sektionen (abgeleitet) */
+  --color-light: #f5f9fc;
+  --color-light-card: #ffffff;
+  --color-light-line: #e2ecf3;
+  --color-light-text: #0b1a26;
+  --color-light-mute: #4a6475;
+
+  /* Ersatzschrift zuerst; Webfont per html.fonts-ready (zweistufiges Laden) */
+  --font-sans: 'Montserrat Fallback', ui-sans-serif, system-ui, sans-serif;
+
+  --text-display: clamp(2.5rem, 1.4rem + 4.4vw, 4.75rem);
+  --text-h2: clamp(1.9rem, 1.3rem + 2.4vw, 3.25rem);
+
+  --radius-card: 1.5rem;
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html.fonts-ready {
+  --font-sans: 'Montserrat', 'Montserrat Fallback', ui-sans-serif, system-ui, sans-serif;
+}
+
+/* ---------- Seitenübergänge (nativ, ohne JS) ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+}
+
+/* ---------- Basis ---------- */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 6rem;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    background: var(--color-ink);
+    color: var(--color-paper);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: clip;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-olive-bright);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+  .on-light :focus-visible {
+    outline-color: var(--color-olive-deep);
+  }
+  ::selection {
+    background: var(--color-olive);
+    color: var(--color-ink);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* ---------- Komponenten ---------- */
+@layer components {
+  .container-page {
+    width: 100%;
+    max-width: 76rem;
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+  @media (width >= 48rem) {
+    .container-page {
+      padding-inline: 2rem;
+    }
+  }
+
+  .display {
+    font-size: var(--text-display);
+    font-weight: 600;
+    line-height: 1.04;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+  }
+  .h2 {
+    font-size: var(--text-h2);
+    font-weight: 600;
+    line-height: 1.12;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+  }
+  .lead {
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    color: var(--color-paper-soft);
+  }
+  .on-light .lead {
+    color: var(--color-light-mute);
+  }
+
+  /* Badge über Headlines (Pill mit Punkt) */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.3rem 0.8rem 0.3rem 0.55rem;
+    border-radius: 999px;
+    border: 1px solid rgb(255 255 255 / 0.1);
+    background: rgb(255 255 255 / 0.04);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-paper-soft);
+  }
+  .badge::before {
+    content: '';
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 999px;
+    background: var(--color-olive-bright);
+    box-shadow: 0 0 12px var(--color-olive-bright);
+  }
+  .on-light .badge {
+    border-color: var(--color-light-line);
+    background: #fff;
+    color: var(--color-light-mute);
+  }
+  .on-light .badge::before {
+    background: var(--color-olive-deep);
+    box-shadow: none;
+  }
+
+  /* Buttons (Pill) */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding: 0.6rem 1.35rem;
+    border-radius: 999px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.2;
+    white-space: nowrap;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease,
+      border-color 0.2s ease,
+      transform 0.2s var(--ease-out-soft);
+  }
+  .btn:active {
+    transform: translateY(1px);
+  }
+  .btn-primary {
+    background: var(--color-olive);
+    color: var(--color-ink);
+    box-shadow: 0 0 0 1px rgb(56 189 248 / 0.4), 0 8px 30px -8px rgb(14 165 233 / 0.6);
+  }
+  .btn-primary:hover {
+    background: var(--color-olive-bright);
+  }
+  .btn-white {
+    background: #fff;
+    color: var(--color-ink);
+  }
+  .btn-white:hover {
+    background: #dff2fc;
+  }
+  .btn-ghost {
+    color: var(--color-paper);
+  }
+  .btn-ghost:hover {
+    color: var(--color-olive-bright);
+  }
+  .btn-soft {
+    background: rgb(255 255 255 / 0.06);
+    border: 1px solid rgb(255 255 255 / 0.08);
+    color: var(--color-paper);
+  }
+  .btn-soft:hover {
+    background: rgb(255 255 255 / 0.1);
+  }
+
+  /* Karten */
+  .card-dark {
+    position: relative;
+    border-radius: var(--radius-card);
+    border: 1px solid rgb(255 255 255 / 0.07);
+    background:
+      radial-gradient(120% 90% at 50% 0%, rgb(14 165 233 / 0.06), transparent 60%),
+      linear-gradient(180deg, rgb(8 30 48 / 0.85), rgb(5 20 33 / 0.85));
+    overflow: hidden;
+  }
+  .card-light {
+    border-radius: var(--radius-card);
+    border: 1px solid var(--color-light-line);
+    background: var(--color-light-card);
+    box-shadow: 0 20px 50px -30px rgb(3 13 20 / 0.25);
+  }
+
+  /* Raster-Linien im Hintergrund dunkler Sektionen */
+  .grid-lines {
+    background-image:
+      linear-gradient(to right, rgb(255 255 255 / 0.035) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(255 255 255 / 0.035) 1px, transparent 1px);
+    background-size: 96px 96px;
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 30%, transparent 75%);
+  }
+
+  /* Laufband */
+  .marquee {
+    display: flex;
+    overflow: hidden;
+    mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+  }
+  .marquee-track {
+    display: flex;
+    flex: none;
+    gap: 0.75rem;
+    padding-right: 0.75rem;
+    animation: marquee var(--marquee-duration, 36s) linear infinite;
+  }
+  .marquee[data-reverse] .marquee-track {
+    animation-direction: reverse;
+  }
+  .marquee:hover .marquee-track {
+    animation-play-state: paused;
+  }
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+/* ---------- Wort-für-Wort-Aufhellung (nur Desktop mit Maus, per GSAP) ---------- */
+.reveal-words .word {
+  display: inline-block;
+}
+
+/* =====================================================================
+   Animationen nach dem Referenzvideo
+   – nur mit JavaScript (html.js) und ohne reduzierte Bewegung
+   – Startzustände mit opacity 0: Inhalte bleiben für Screenreader lesbar
+   ===================================================================== */
+
+/* ---------- Gestapelte Sektionen (nächste schiebt sich über die vorige) ---------- */
+[data-stack] {
+  position: sticky;
+  top: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* ---------- Wort für Wort: aus Unschärfe, leicht von unten ---------- */
+  html.js [data-anim='words'] .w,
+  html.hero-armed [data-hero='words'] .w {
+    display: inline-block;
+    opacity: 0;
+    filter: blur(10px);
+    transform: translateY(0.35em);
+  }
+  html.js [data-anim='words'].in .w,
+  html.hero-play [data-hero='words'] .w {
+    opacity: 1;
+    filter: blur(0);
+    transform: none;
+    transition:
+      opacity 0.7s ease,
+      filter 0.8s ease,
+      transform 0.9s var(--ease-out-soft);
+    transition-delay: calc(var(--delay, 0ms) + var(--i) * var(--step, 120ms));
+  }
+
+  /* ---------- Hero-Sequenz (nach dem Intro-Vorhang) ---------- */
+  html.hero-armed [data-hero='fade'] {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  html.hero-armed [data-hero='pop'] {
+    opacity: 0;
+    transform: scale(0.82);
+  }
+  html.hero-armed [data-hero='glow'] {
+    opacity: 0;
+  }
+  html.hero-play [data-hero='fade'],
+  html.hero-play [data-hero='pop'],
+  html.hero-play [data-hero='glow'] {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 0.7s ease,
+      transform 0.8s var(--ease-out-soft);
+    transition-delay: var(--hd, 0ms);
+  }
+  html.hero-play [data-hero='glow'] {
+    transition-duration: 1.4s;
+  }
+  /* Navigation: Punkte nacheinander, Logo-Buchstaben einzeln */
+  html.hero-armed [data-hero-nav] > * {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  html.hero-play [data-hero-nav] > * {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 0.6s ease,
+      transform 0.6s var(--ease-out-soft);
+    transition-delay: calc(250ms + var(--ni, 0) * 70ms);
+  }
+  html.hero-armed .header-logo .l {
+    opacity: 0;
+    filter: blur(6px);
+  }
+  html.hero-play .header-logo .l {
+    opacity: 1;
+    filter: blur(0);
+    transition:
+      opacity 0.45s ease,
+      filter 0.45s ease;
+    transition-delay: calc(900ms + var(--i) * 55ms);
+  }
+
+  /* ---------- Einblenden von unten ---------- */
+  html.js [data-anim='fade'] {
+    opacity: 0;
+    transform: translateY(32px);
+  }
+  html.js [data-anim='rise'] {
+    opacity: 0;
+    transform: translateY(110px);
+  }
+  html.js [data-anim='fade'].in,
+  html.js [data-anim='rise'].in {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 0.8s ease,
+      transform 1s var(--ease-out-soft);
+    transition-delay: var(--delay, 0ms);
+  }
+
+  /* ---------- Gestaffelte Gruppen ---------- */
+  html.js [data-anim='stagger'] > * {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  html.js [data-anim='stagger'].in > * {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 0.7s ease,
+      transform 0.9s var(--ease-out-soft);
+    transition-delay: calc(var(--delay, 0ms) + var(--si, 0) * var(--step, 90ms));
+  }
+  /* Bento: Karten tauchen aus dem Dunkel auf, Lichter gehen danach an */
+  html.js [data-anim='cards'] > * {
+    opacity: 0;
+    transform: translateY(24px) scale(0.98);
+    filter: brightness(0.35);
+  }
+  html.js [data-anim='cards'].in > * {
+    opacity: 1;
+    transform: none;
+    filter: brightness(1);
+    transition:
+      opacity 0.8s ease,
+      transform 1s var(--ease-out-soft),
+      filter 1.6s ease;
+    transition-delay: calc(var(--si, 0) * 110ms);
+  }
+  html.js [data-anim='cards'] [data-light] {
+    opacity: 0;
+  }
+  html.js [data-anim='cards'].in [data-light] {
+    opacity: 1;
+    transition: opacity 1.2s ease;
+    transition-delay: calc(var(--si, 0) * 110ms + 700ms);
+  }
+
+  /* ---------- Punkt wächst zur Pille (Tabs) ---------- */
+  html.js [data-anim='pill'] {
+    clip-path: circle(7px at var(--px, 50%) 50%);
+    transform: translateY(40px);
+  }
+  html.js [data-anim='pill'].in {
+    clip-path: circle(150% at var(--px, 50%) 50%);
+    transform: none;
+    transition:
+      transform 0.7s var(--ease-out-soft),
+      clip-path 0.9s cubic-bezier(0.65, 0, 0.35, 1) 0.45s;
+  }
+
+  /* ---------- Reihe klappt von links auf, Elemente einzeln ---------- */
+  html.js [data-anim='expand'] {
+    clip-path: inset(0 100% 0 0 round 12px);
+  }
+  html.js [data-anim='expand'].in {
+    clip-path: inset(0 0 0 0 round 12px);
+    transition: clip-path 1s cubic-bezier(0.65, 0, 0.35, 1) var(--delay, 0ms);
+  }
+  html.js [data-anim='expand'] > * {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  html.js [data-anim='expand'].in > * {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 0.4s ease,
+      transform 0.5s var(--ease-out-soft);
+    transition-delay: calc(var(--delay, 0ms) + 150ms + var(--si, 0) * 70ms);
+  }
+
+  /* ---------- Gestrichelte Linien wachsen vom Badge nach außen ---------- */
+  html.js [data-anim='lines'] .line {
+    transform: scaleX(0);
+  }
+  html.js [data-anim='lines'] .line-l {
+    transform-origin: right center;
+  }
+  html.js [data-anim='lines'] .line-r {
+    transform-origin: left center;
+  }
+  html.js [data-anim='lines'].in .line {
+    transform: none;
+    transition: transform 1s cubic-bezier(0.65, 0, 0.35, 1) 0.3s;
+  }
+
+  /* ---------- Inhalte, die nach ihrem Container erscheinen ---------- */
+  html.js [data-anim] [data-later] {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  html.js [data-anim].in [data-later] {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 0.7s ease,
+      transform 0.8s var(--ease-out-soft);
+    transition-delay: var(--later, 600ms);
+  }
+
+  /* ---------- Buchstaben einzeln (Footer-Wortmarke) ---------- */
+  html.js [data-anim='letters'] .l {
+    opacity: 0;
+    filter: blur(6px);
+  }
+  html.js [data-anim='letters'].in .l {
+    opacity: 1;
+    filter: blur(0);
+    transition:
+      opacity 0.45s ease,
+      filter 0.45s ease;
+    transition-delay: calc(300ms + var(--i) * 55ms);
+  }
+}
+
+/* ---------- Scroll-gekoppelt auf Touch-Geräten (Desktop: GSAP, siehe scripts/motion.ts) ---------- */
+@media (prefers-reduced-motion: no-preference) and ((width < 64rem) or (pointer: coarse)) {
+  @supports (animation-timeline: view()) {
+    [data-scroll='globe'] {
+      animation: globe-rise linear both;
+      animation-timeline: --globe;
+      animation-range: entry 0% entry 100%;
+    }
+    [data-scroll-root='globe'] {
+      view-timeline-name: --globe;
+    }
+    [data-scroll='arc'] {
+      animation: arc-rise linear both;
+      animation-timeline: --arc;
+      animation-range: entry 20% cover 55%;
+    }
+    [data-scroll-root='arc'] {
+      view-timeline-name: --arc;
+    }
+  }
+}
+@keyframes globe-rise {
+  from {
+    transform: translate(-50%, 40%) scale(0.72);
+  }
+  to {
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+@keyframes arc-rise {
+  from {
+    transform: translate(-50%, 35%);
+    opacity: 0.4;
+  }
+  to {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+}

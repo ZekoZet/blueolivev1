@@ -1,0 +1,47 @@
+---
+import CircuitBoard from './CircuitBoard.astro';
+import Icon from './Icon.astro';
+import Words from './Words.astro';
+import { hero } from '../data/site';
+---
+
+<section id="top" class="on-dark relative isolate overflow-hidden bg-ink pt-12 pb-10 desk:pt-28" data-stack>
+  <!-- Raster und diagonaler Lichtstrahl oben rechts -->
+  <div class="grid-lines absolute inset-0 -z-10" aria-hidden="true"></div>
+  <div class="absolute inset-0 -z-10" data-hero="glow" style="--hd:100ms" aria-hidden="true"><div class="beam absolute"></div></div>
+  <div class="absolute inset-x-0 top-0 -z-10 h-[60%] bg-[radial-gradient(ellipse_60%_70%_at_50%_0%,rgb(14_165_233/0.12),transparent_70%)]" aria-hidden="true"></div>
+
+  <div class="container-page text-center">
+    <p class="badge" data-hero="fade" style="--hd:80ms">{hero.badge}</p>
+    <h1 class="display mx-auto mt-5 max-w-4xl" data-hero="words" style="--delay:200ms;--step:160ms"><Words text={hero.title} /></h1>
+    <p class="lead mx-auto mt-5 max-w-2xl" data-hero="fade" style="--hd:850ms">{hero.text}</p>
+    <!-- feste Anordnung je Breite: kein Umbruchwechsel, wenn die Webschrift eingewechselt wird -->
+    <div class="mt-8 flex flex-col items-center justify-center gap-2 sm:flex-row sm:gap-3" data-hero="fade" style="--hd:1050ms">
+      <a href={hero.primary.href} class="btn btn-primary">
+        {hero.primary.label}
+      </a>
+      <a href={hero.secondary.href} class="btn btn-ghost">
+        {hero.secondary.label}
+        <Icon name="arrow-right" size={16} />
+      </a>
+    </div>
+  </div>
+
+  <div class="container-page mt-10 md:mt-14">
+    <CircuitBoard />
+  </div>
+</section>
+
+<style>
+  .beam {
+    top: -10%;
+    right: -6%;
+    width: min(46vw, 640px);
+    height: 120px;
+    background: linear-gradient(90deg, transparent, rgb(14 165 233 / 0.15) 30%, rgb(56 189 248 / 0.75) 75%, #e0f6ff);
+    filter: blur(28px);
+    transform: rotate(-32deg);
+    transform-origin: right center;
+    opacity: 0.8;
+  }
+</style>

@@ -1,0 +1,17 @@
+---
+import Icon from './Icon.astro';
+import { topBar } from '../data/site';
+---
+
+<div class="relative z-50 hidden h-9 border-b border-white/5 bg-black text-[0.75rem] text-paper-soft md:block">
+  <div class="container-page flex h-full items-center justify-between gap-4">
+    <a href={topBar.href} class="inline-flex items-center gap-2 transition-colors hover:text-paper">
+      <span class="size-1.5 rounded-full bg-olive-bright shadow-[0_0_8px_var(--color-olive-bright)]" aria-hidden="true"></span>
+      {topBar.text}
+      <Icon name="arrow-right" size={14} />
+    </a>
+    <p class="flex items-center gap-5">
+      {topBar.meta.map((m) => <span>{m}</span>)}
+    </p>
+  </div>
+</div>

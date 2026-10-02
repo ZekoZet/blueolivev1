@@ -1,0 +1,45 @@
+---
+import Words from './Words.astro';
+import Icon, { type IconName } from './Icon.astro';
+import { services } from '../data/site';
+
+const icons: Record<string, IconName> = {
+  relaunch: 'refresh',
+  landing: 'target',
+  audit: 'gauge',
+  a11y: 'eye',
+  care: 'wrench',
+  system: 'palette',
+};
+---
+
+<section id="weitere-leistungen" class="on-dark relative bg-ink pb-20 md:pb-28">
+  <div class="container-page">
+    <h2 class="h2 text-center" data-anim="words"><Words text={services.title} /></h2>
+    <ul class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" data-anim="stagger" style="--delay:200ms;--step:110ms">
+      {
+        services.items.map((s) => (
+          <li class="card-dark flex min-h-64 flex-col p-7">
+            <span class="icon-glow grid size-11 place-items-center rounded-full text-olive-bright">
+              <Icon name={icons[s.key] ?? 'sparkle'} size={20} />
+            </span>
+            <h3 class="mt-auto pt-10 text-lg font-semibold">{s.title}</h3>
+            <p class="mt-2 text-sm text-paper-soft">{s.text}</p>
+            <a href="#kontakt" class="mt-5 inline-flex min-h-11 items-center gap-1.5 self-start text-sm font-semibold text-paper transition-colors hover:text-olive-bright">
+              {services.more}
+              <span class="sr-only">: {s.title}</span>
+              <Icon name="arrow-right" size={16} />
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .icon-glow {
+    background: radial-gradient(circle, rgb(14 165 233 / 0.35), rgb(14 165 233 / 0.08) 70%);
+    box-shadow: 0 0 30px -4px rgb(14 165 233 / 0.6);
+  }
+</style>

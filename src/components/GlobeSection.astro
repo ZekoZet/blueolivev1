@@ -1,0 +1,78 @@
+---
+import Words from './Words.astro';
+import { Image } from 'astro:assets';
+import dots from '../assets/globe-dots.png';
+import marker from '../data/globe-marker.json';
+import { globe } from '../data/site';
+---
+
+<section id="standort" class="on-dark relative isolate overflow-hidden bg-black pt-20 md:pt-28" data-stack data-scroll-root="globe">
+  <div class="stars absolute inset-0 -z-10" aria-hidden="true"></div>
+  <div class="container-page text-center">
+    <p class="badge" data-anim="fade">{globe.badge}</p>
+    <h2 class="h2 mx-auto mt-5 max-w-3xl" data-anim="words"><Words text={globe.title} /></h2>
+    <p class="lead mx-auto mt-4 max-w-xl" data-anim="fade" style="--delay:700ms">{globe.text}</p>
+  </div>
+
+  <div class="relative mt-10 h-[min(62vw,620px)] w-full overflow-hidden md:mt-14">
+    <div class="globe absolute left-1/2 aspect-square w-[min(110vw,900px)]" data-scroll="globe">
+      <div class="globe-sphere absolute inset-0 rounded-full" aria-hidden="true"></div>
+      <Image src={dots} alt="" widths={[480, 760, 1100, 1400]} sizes="(min-width: 900px) 900px, 110vw" class="absolute inset-[1%] size-[98%]" />
+      <span class="ping absolute" style={`left:${marker.x * 100}%;top:${marker.y * 100}%`} aria-hidden="true"></span>
+      <span class="sr-only">Standort Ofterdingen</span>
+    </div>
+  </div>
+</section>
+
+<style>
+  .stars {
+    background-image:
+      radial-gradient(1px 1px at 12% 22%, rgb(255 255 255 / 0.6), transparent 60%),
+      radial-gradient(1px 1px at 78% 14%, rgb(255 255 255 / 0.5), transparent 60%),
+      radial-gradient(1.5px 1.5px at 30% 68%, rgb(255 255 255 / 0.45), transparent 60%),
+      radial-gradient(1px 1px at 88% 58%, rgb(255 255 255 / 0.5), transparent 60%),
+      radial-gradient(1px 1px at 52% 36%, rgb(255 255 255 / 0.35), transparent 60%),
+      radial-gradient(1.5px 1.5px at 6% 80%, rgb(255 255 255 / 0.4), transparent 60%),
+      radial-gradient(1px 1px at 66% 84%, rgb(255 255 255 / 0.4), transparent 60%),
+      radial-gradient(1px 1px at 94% 30%, rgb(255 255 255 / 0.5), transparent 60%);
+    background-size: 420px 420px;
+  }
+  .globe {
+    top: 4%;
+    transform: translateX(-50%);
+  }
+  .globe-sphere {
+    background: radial-gradient(circle at 50% 40%, #0b2236 0%, #04121d 55%, #020a10 100%);
+    box-shadow:
+      0 0 0 1px rgb(56 189 248 / 0.35),
+      0 -10px 80px 10px rgb(14 165 233 / 0.45),
+      0 -30px 160px 40px rgb(3 105 161 / 0.35),
+      inset 0 20px 60px rgb(56 189 248 / 0.35);
+  }
+  .ping {
+    width: 14px;
+    height: 14px;
+    margin: -7px 0 0 -7px;
+    border-radius: 999px;
+    background: var(--color-olive-bright);
+    box-shadow: 0 0 16px 4px rgb(56 189 248 / 0.8);
+  }
+  .ping::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    border: 2px solid var(--color-olive-bright);
+    animation: ping 2.2s var(--ease-out-soft) infinite;
+  }
+  @keyframes ping {
+    from {
+      transform: scale(1);
+      opacity: 0.9;
+    }
+    to {
+      transform: scale(4);
+      opacity: 0;
+    }
+  }
+</style>

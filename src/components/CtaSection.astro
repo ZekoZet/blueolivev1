@@ -1,0 +1,49 @@
+---
+import Words from './Words.astro';
+import Icon from './Icon.astro';
+import { contactCta, site } from '../data/site';
+---
+
+<section id="kontakt" class="on-dark relative bg-ink pb-16 md:pb-24" data-scroll-root="arc">
+  <div class="container-page">
+    <div class="cta relative isolate overflow-hidden rounded-[2rem] border border-white/8 px-6 pt-20 pb-40 text-center md:pt-28 md:pb-56">
+      <div class="arc absolute -z-10" aria-hidden="true" data-scroll="arc"></div>
+      <h2 class="h2 mx-auto max-w-3xl" data-anim="words"><Words text={contactCta.title} /></h2>
+      <p class="lead mx-auto mt-4 max-w-xl" data-anim="fade" style="--delay:500ms">{contactCta.text}</p>
+      <div class="mt-8 flex flex-wrap justify-center gap-3" data-anim="fade" style="--delay:700ms">
+        <a href={`mailto:${site.email}?subject=${encodeURIComponent('Erstgespräch – Blue Olive Lab')}`} class="btn btn-white">
+          <Icon name="mail" size={16} />
+          {contactCta.button}
+        </a>
+      </div>
+      <address class="mt-6 text-sm text-paper-soft not-italic">
+        {site.owner} · {site.street}, {site.zip} {site.city}
+      </address>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cta {
+    background: linear-gradient(180deg, #000 0%, #020a10 45%, transparent 100%);
+  }
+  /* Leuchtbogen: große Ellipse, deren Oberkante im unteren Kartendrittel aufsteigt */
+  .arc {
+    left: 50%;
+    top: 62%;
+    width: 150%;
+    height: 120%;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background: radial-gradient(
+      ellipse 50% 50% at 50% 50%,
+      #ffffff 0%,
+      #ffffff 58%,
+      #e0f6ff 70%,
+      #38bdf8 82%,
+      #0369a1 90%,
+      rgb(3 13 20 / 0) 100%
+    );
+    filter: blur(10px);
+  }
+</style>

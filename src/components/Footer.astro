@@ -1,0 +1,76 @@
+---
+import Logo from './Logo.astro';
+import Icon from './Icon.astro';
+import { footer, site } from '../data/site';
+---
+
+<footer class="on-dark relative isolate overflow-hidden border-t border-white/5 bg-ink pt-16 pb-24 touch:pb-28 md:pt-20">
+  <div class="absolute -top-40 right-0 -z-10 h-80 w-[60%] bg-[radial-gradient(ellipse_at_70%_30%,rgb(14_165_233/0.18),transparent_65%)]" aria-hidden="true"></div>
+  <div class="container-page">
+    <div class="grid gap-10 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]" data-anim="stagger" style="--step:120ms">
+      <div data-anim="letters">
+        <Logo size={38} />
+        <p class="mt-4 max-w-xs text-sm text-paper-soft">{footer.text}</p>
+      </div>
+      {
+        footer.columns.map((col) => (
+          <div>
+            <h2 class="text-sm font-semibold text-paper">{col.title}</h2>
+            <ul class="mt-4 space-y-1">
+              {col.links.map(([label, href]) => (
+                <li>
+                  <a href={href} class="inline-flex min-h-9 items-center text-sm text-paper-soft transition-colors hover:text-paper">
+                    {label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+      <div>
+        <h2 class="text-sm font-semibold text-paper">Kontakt</h2>
+        <address class="mt-4 space-y-2 text-sm text-paper-soft not-italic">
+          <p>
+            {site.owner}
+            <br />
+            {site.street}
+            <br />
+            {site.zip} {site.city}
+          </p>
+          <p>
+            <a href={`mailto:${site.email}`} class="inline-flex min-h-9 items-center transition-colors hover:text-paper">{site.email}</a>
+          </p>
+          <p>{site.domain}</p>
+        </address>
+      </div>
+    </div>
+
+    <div class="mt-12 grid items-center gap-6 border-t border-white/8 pt-8 lg:grid-cols-[1fr_1.2fr_1fr]" data-anim="fade" style="--delay:400ms">
+      <ul class="flex flex-wrap gap-2" aria-label="Qualitätsmerkmale">
+        {footer.badges.map((b) => <li class="rounded-full border border-white/10 px-3 py-1.5 text-xs text-paper-soft">{b}</li>)}
+      </ul>
+      <p class="text-sm font-semibold">{footer.quick.title}</p>
+      <form class="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 p-1.5 pl-4" data-quick-form>
+        <label for="quick-mail" class="sr-only">{footer.quick.placeholder}</label>
+        <input id="quick-mail" name="mail" type="email" required autocomplete="email" placeholder={footer.quick.placeholder} class="min-h-10 flex-1 bg-transparent text-sm outline-none placeholder:text-paper-mute" />
+        <button type="submit" class="grid size-10 shrink-0 place-items-center rounded-full bg-paper text-ink transition-colors hover:bg-olive-bright" aria-label="Schnellanfrage per E-Mail senden">
+          <Icon name="arrow-right" size={18} />
+        </button>
+      </form>
+    </div>
+
+    <p class="mt-10 text-xs text-paper-soft">{footer.copyright}</p>
+  </div>
+</footer>
+
+<script define:vars={{ email: site.email }}>
+  const form = document.querySelector('[data-quick-form]');
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const mail = new FormData(form).get('mail')?.toString().trim() ?? '';
+    if (!mail) return;
+    const body = encodeURIComponent(`Bitte um Rückmeldung mit einem Terminvorschlag an: ${mail}`);
+    window.location.href = `mailto:${email}?subject=${encodeURIComponent('Schnellanfrage – Blue Olive Lab')}&body=${body}`;
+  });
+</script>
